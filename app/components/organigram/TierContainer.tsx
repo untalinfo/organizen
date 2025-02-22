@@ -23,7 +23,6 @@ interface TierContainerProps {
 
 export function TierContainer({
   tier,
-  // tiers,
   accentColor,
   onDelete,
   onEmployeeSheetOpen,
@@ -34,7 +33,6 @@ export function TierContainer({
   });
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(defaultName || `${tier.title}`);
-  console.log('TIER', tier)
 
   return (
     <div

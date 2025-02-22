@@ -35,8 +35,6 @@ export function PositionCard({
     isDragging,
   } = useSortable({ id: position.id });
 
-  console.log('POSITION', position)
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,

@@ -34,8 +34,6 @@ export default function EmployeeList({ open, onOpenChange, employees }: Employee
     setLocalEmployees(localEmployees.filter((emp) => emp.id !== id));
   };
 
-  console.log("EMPLOYEES", employees, localEmployees);
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md">
