@@ -1,9 +1,7 @@
 import { DndContext, DragOverlay, closestCenter, DragStartEvent, DragEndEvent } from "@dnd-kit/core";
-import { ChevronRight } from "lucide-react";
-import { Button } from "@/app/components/ui/button";
 import { TierContainer } from "./TierContainer";
 import { PositionCard } from "./PositionCard";
-import type { Position, Tier } from "../../types/types";
+import type { Employee, Position, Tier } from "../../types/types";
 
 interface OrgChartContentProps {
   tiers: Tier[];
@@ -12,7 +10,7 @@ interface OrgChartContentProps {
   onDragStart: (event: DragStartEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
   onDelete: (id: string) => void;
-  onEmployeeSheetOpen: () => void;
+  onEmployeeSheetOpen: (employees: { count: number; data: Employee[] }) => void;
   findPosition: (id: string) => Position | undefined;
 }
 
@@ -26,6 +24,7 @@ export function OrgChartContent({
   onEmployeeSheetOpen,
   findPosition,
 }: OrgChartContentProps) {
+
   const activePosition = activeId ? findPosition(activeId) : null;
 
   return (
@@ -49,15 +48,9 @@ export function OrgChartContent({
                 tiers={tiers}
                 accentColor={index === 0 ? "#37c99f" : "#fab8c3"}
                 onDelete={onDelete}
+                onEmployeeSheetOpen={onEmployeeSheetOpen}
               />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-0 top-1/2 -translate-y-1/2 mr-[-2.5rem]"
-                onClick={onEmployeeSheetOpen}
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
+              
             </div>
           ))}
         </div>
@@ -76,7 +69,6 @@ export function OrgChartContent({
                 accentColor={
                   activePosition.tierId === "tier-1" ? "#37c99f" : "#fab8c3"
                 }
-                onDelete={onDelete}
               />
             </div>
           ) : null}

@@ -7,91 +7,61 @@ import {
 } from "@dnd-kit/sortable";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
-import type { Position, Tier } from "../../types/types";
+import { Input } from "@/app/components/ui/input";
+import type { Employee, Tier } from "../../types/types";
 import { PositionCard } from "./PositionCard";
+import { useState } from "react";
 
 interface TierContainerProps {
   tier: Tier;
   tiers: Tier[];
   accentColor: string;
   onDelete: (id: string) => void;
+  onEmployeeSheetOpen: (employees: { count: number; data: Employee[] }) => void;
+  defaultName?: string;
 }
 
 export function TierContainer({
   tier,
-  tiers,
+  // tiers,
   accentColor,
   onDelete,
+  onEmployeeSheetOpen,
+  defaultName = "",
 }: TierContainerProps) {
   const { setNodeRef } = useDroppable({
     id: tier.id,
   });
-
-  const findSubordinatePositions = (positionId: string): Position[] => {
-    const position = tier.positions.find((p) => p.id === positionId);
-    if (!position) return [];
-
-    const subordinates: Position[] = [];
-    position.subordinates.forEach((subId) => {
-      tiers.forEach((t) => {
-        const sub = t.positions.find((p) => p.id === subId);
-        if (sub) subordinates.push(sub);
-      });
-    });
-    return subordinates;
-  };
-
-  const renderConnectorLines = (position: Position) => {
-    const subordinates = findSubordinatePositions(position.id);
-    if (subordinates.length === 0) return null;
-
-    const lineWidth = (subordinates.length - 1) * 240;
-    const centerOffset = lineWidth / 2;
-
-    return (
-      <>
-        {/* Línea vertical desde la tarjeta actual */}
-        <div className="absolute left-1/2 -bottom-12 w-px h-12 bg-border" />
-
-        {/* Línea horizontal que conecta a los subordinados */}
-        {subordinates.length > 1 && (
-          <div
-            className="absolute h-px bg-border"
-            style={{
-              width: `${lineWidth}px`,
-              left: `50%`,
-              transform: `translateX(-${centerOffset}px)`,
-              bottom: "-12px",
-            }}
-          />
-        )}
-
-        {/* Líneas verticales a los subordinados */}
-        {subordinates.map((sub, index) => {
-          const xPosition = index * 240 - centerOffset;
-          return (
-            <div
-              key={sub.id}
-              className="absolute w-px h-12 bg-border"
-              style={{
-                left: `calc(50% + ${xPosition}px)`,
-                bottom: "-24px",
-              }}
-            />
-          );
-        })}
-      </>
-    );
-  };
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(defaultName || `${tier.title}`);
+  console.log('TIER', tier)
 
   return (
     <div
       ref={setNodeRef}
-      className="border-2 border-dashed border-gray-300 p-4 rounded-lg"
+      className="relative mb-4 min-h-[200px] rounded-lg border-2 border-dashed border-gray-200 p-4"
     >
-      <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-lg font-semibold text-foreground">{tier.title}</h2>
-        <Pencil className="w-4 h-4 text-muted-foreground" />
+      <div className="absolute -top-3 left-4 flex items-center gap-2 bg-white px-2">
+        {isEditing ? (
+          <Input
+            className="h-6 w-32"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={() => setIsEditing(false)}
+            onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+            autoFocus
+          />
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{name}</span>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="opacity-50 hover:opacity-100"
+            >
+              <Pencil className="h-3 w-3" />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="relative">
@@ -106,8 +76,9 @@ export function TierContainer({
                   position={position}
                   accentColor={accentColor}
                   onDelete={onDelete}
+                  onEmployeeSheetOpen={onEmployeeSheetOpen}
                 />
-                {renderConnectorLines(position)}
+                {/* {renderConnectorLines(position)} */}
                 <Button
                   variant="secondary"
                   size="icon"

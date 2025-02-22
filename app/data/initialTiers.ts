@@ -8,7 +8,12 @@ export const initialTiers: Tier[] = [
       {
         id: "position-1",
         title: "COO",
-        employees: 2,
+        employees: {
+          count: 2,
+          data: [
+            {id: '1', name: "John Doe", email: "john.doe@example.com" },
+            {id: '2', name: "Jane Smith", email: "jane.smith@example.com" },
+          ],},
         division: "Operations",
         tierId: "tier-1",
         subordinates: ["position-2", "position-3"],
@@ -22,7 +27,12 @@ export const initialTiers: Tier[] = [
       {
         id: "position-2",
         title: "Business Operations",
-        employees: 1,
+        employees: {
+          count: 1,
+          data: [
+            {id: '3', name: "Alice Johnson", email: "alice.johnson@example.com" },
+          ],
+        },
         division: "Operations",
         tierId: "tier-2",
         subordinates: ["position-4"],
@@ -30,24 +40,16 @@ export const initialTiers: Tier[] = [
       {
         id: "position-3",
         title: "Business Development",
-        employees: 2,
+        employees: {
+          count: 2,
+          data: [
+            {id: '4', name: "Bob Brown", email: "bob.brown@example.com" },
+            {id: '5', name: "Charlie Davis", email: "charlie.davis@example.com" },
+          ],
+        },
         division: "Operations",
         tierId: "tier-2",
-        subordinates: [],
-      },
-    ],
-  },
-  {
-    id: "tier-3",
-    title: "TIER 3",
-    positions: [
-      {
-        id: "position-4",
-        title: "Planning Analyst",
-        employees: 0,
-        division: "Operations",
-        tierId: "tier-3",
-        subordinates: [],
+        subordinates: ["position-1"],
       },
     ],
   },

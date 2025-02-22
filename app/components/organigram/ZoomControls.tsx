@@ -1,5 +1,7 @@
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { useState } from "react";
+import { CreateNewModal } from "./CreateNewModal";
 
 interface ZoomControlsProps {
   zoom: number;
@@ -7,8 +9,9 @@ interface ZoomControlsProps {
 }
 
 export function ZoomControls({ zoom, setZoom }: ZoomControlsProps) {
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-background p-2 rounded-lg shadow-lg">
+    <div className="fixed bottom-6 right-6 flex items-center gap-4 bg-background p-2 rounded-lg shadow-lg">
       <Button
         variant="ghost"
         size="icon"
@@ -16,7 +19,10 @@ export function ZoomControls({ zoom, setZoom }: ZoomControlsProps) {
       >
         <ZoomOut className="w-5 h-5" />
       </Button>
-      <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8">
+      <Button
+        className="bg-primary text-primary hover:bg-primary/90 px-8"
+        onClick={() => setCreateDialogOpen(true)}
+      >
         New position
       </Button>
       <Button
@@ -26,6 +32,10 @@ export function ZoomControls({ zoom, setZoom }: ZoomControlsProps) {
       >
         <ZoomIn className="w-5 h-5" />
       </Button>
+      <CreateNewModal
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
     </div>
   );
 }
