@@ -1,22 +1,16 @@
 "use client";
 
 import { useState } from "react";
-// import {
-//   KeyboardSensor,
-//   PointerSensor,
-//   useSensor,
-//   useSensors,
-// } from "@dnd-kit/core";
-// import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-// import { OrgChartHeader } from "./components/OrgChartHeader";
 import { OrgChartContent } from "../components/organigram/OrgChartContent";
-import  EmployeeList  from "../components/organigram/EmployeeList";
+import EmployeeList from "../components/organigram/EmployeeList";
 import { ZoomControls } from "../components/organigram/ZoomControls";
 import { useOrgChart } from "../hooks/useOrgChart";
+import { Employee } from "../types/types";
 
 export default function OrgChart() {
   const [zoom, setZoom] = useState(100);
   const [employeeSheetOpen, setEmployeeSheetOpen] = useState(false);
+  const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>([]);
   const {
     tiers,
     activeId,
@@ -26,16 +20,14 @@ export default function OrgChart() {
     handleDelete,
   } = useOrgChart();
 
-  // const sensors = useSensors(
-  //   useSensor(PointerSensor, {
-  //     activationConstraint: {
-  //       distance: 5,
-  //     },
-  //   }),
-  //   useSensor(KeyboardSensor, {
-  //     coordinateGetter: sortableKeyboardCoordinates,
-  //   })
-  // );
+  console.log("HERE", employeeSheetOpen);
+  const handleEmployeeSheetOpen = (employees: {
+    count: number;
+    data: Employee[];
+  }) => {
+    setSelectedEmployees(employees.data);
+    setEmployeeSheetOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -46,13 +38,14 @@ export default function OrgChart() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDelete={handleDelete}
-        onEmployeeSheetOpen={() => setEmployeeSheetOpen(true)}
+        onEmployeeSheetOpen={handleEmployeeSheetOpen}
         findPosition={findPosition}
       />
       <ZoomControls zoom={zoom} setZoom={setZoom} />
       <EmployeeList
         open={employeeSheetOpen}
         onOpenChange={setEmployeeSheetOpen}
+        employees={selectedEmployees}
       />
     </div>
   );

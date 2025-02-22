@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetDescription,
-  SheetClose,
 } from "@/app/components/ui/sheet";
-import { Users, Pencil, Trash2, X } from "lucide-react";
+import { Users, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 
 interface Employee {
@@ -20,26 +19,22 @@ interface Employee {
 interface EmployeeListProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  employees: Employee[];
 }
 
 
-export default function EmployeeList({ open, onOpenChange }: EmployeeListProps) {
-  const [employees, setEmployees] = useState<Employee[]>([
-    {
-      id: "1",
-      name: "Juan Pérez",
-      email: "juan@empresa.com",
-    },
-    {
-      id: "2",
-      name: "María García",
-      email: "maria@empresa.com",
-    },
-  ]);
+export default function EmployeeList({ open, onOpenChange, employees }: EmployeeListProps) {
+  const [localEmployees, setLocalEmployees] = useState<Employee[]>(employees);
+
+  useEffect(() => {
+    setLocalEmployees(employees);
+  }, [employees]);
 
   const handleDelete = (id: string) => {
-    setEmployees(employees.filter((emp) => emp.id !== id));
+    setLocalEmployees(localEmployees.filter((emp) => emp.id !== id));
   };
+
+  console.log("EMPLOYEES", employees, localEmployees);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -52,11 +47,6 @@ export default function EmployeeList({ open, onOpenChange }: EmployeeListProps) 
                 Employees - Sellers
               </SheetTitle>
             </div>
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <X className="w-4 h-4" />
-              </Button>
-            </SheetClose>
           </div>
           <SheetDescription className="text-base">
             <div className="flex justify-between items-center">
@@ -69,7 +59,7 @@ export default function EmployeeList({ open, onOpenChange }: EmployeeListProps) 
         </SheetHeader>
 
         <div className="space-y-2">
-          {employees.map((employee) => (
+          {localEmployees.map((employee) => (
             <div
               key={employee.id}
               className="flex items-center justify-between p-4 bg-gray-50 rounded-lg group"
