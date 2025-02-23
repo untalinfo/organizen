@@ -20,7 +20,6 @@ export default function OrgChart() {
     handleDelete,
   } = useOrgChart();
 
-  console.log("HERE", employeeSheetOpen);
   const handleEmployeeSheetOpen = (employees: {
     count: number;
     data: Employee[];

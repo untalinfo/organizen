@@ -11,6 +11,7 @@ import { Input } from "@/app/components/ui/input";
 import type { Employee, Tier } from "../../types/types";
 import { PositionCard } from "./PositionCard";
 import { useState } from "react";
+import Xarrow, { Xwrapper } from "react-xarrows";
 
 interface TierContainerProps {
   tier: Tier;
@@ -23,7 +24,6 @@ interface TierContainerProps {
 
 export function TierContainer({
   tier,
-  // tiers,
   accentColor,
   onDelete,
   onEmployeeSheetOpen,
@@ -34,7 +34,22 @@ export function TierContainer({
   });
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(defaultName || `${tier.title}`);
-  console.log('TIER', tier)
+
+  const handleCreateNewPosition = () => {
+    const lastPosition = tier.positions[tier.positions.length - 1];
+    const lastPositionId = parseInt(lastPosition.id.split("-")[1]);
+    const newPositionId = `position-${lastPositionId + 1}`;
+
+    tier.positions.push({
+      id: newPositionId,
+      title: "New Position",
+      employees: { count: 0, data: [] },
+      division: "Operations",
+      tierId: tier.id,
+      subordinates: [],
+    });
+    alert("New position created");
+  }
 
   return (
     <div
@@ -70,24 +85,33 @@ export function TierContainer({
           strategy={horizontalListSortingStrategy}
         >
           <div className="flex gap-16 justify-center">
-            {tier.positions.map((position) => (
-              <div key={position.id} className="relative">
-                <PositionCard
-                  position={position}
-                  accentColor={accentColor}
-                  onDelete={onDelete}
-                  onEmployeeSheetOpen={onEmployeeSheetOpen}
-                />
-                {/* {renderConnectorLines(position)} */}
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
+            <Xwrapper>
+              {tier.positions.map((position) => (
+                <div key={position.id} className="relative">
+                  <PositionCard
+                    position={position}
+                    accentColor={accentColor}
+                    onDelete={onDelete}
+                    onEmployeeSheetOpen={onEmployeeSheetOpen}
+                    id={`${position.id}`}
+                  />
+                  <Xarrow
+                    start={`position-1`}
+                    end={`${position.id}`}
+                    color="grey"
+                    showHead={false}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-white shadow"
+                    onClick={handleCreateNewPosition}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </Xwrapper>
           </div>
         </SortableContext>
       </div>

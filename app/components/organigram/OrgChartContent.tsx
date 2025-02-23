@@ -2,6 +2,8 @@ import { DndContext, DragOverlay, closestCenter, DragStartEvent, DragEndEvent } 
 import { TierContainer } from "./TierContainer";
 import { PositionCard } from "./PositionCard";
 import type { Employee, Position, Tier } from "../../types/types";
+import Tiers from "@/app/api/tiers";
+import { useEffect, useState } from "react";
 
 interface OrgChartContentProps {
   tiers: Tier[];
@@ -26,6 +28,18 @@ export function OrgChartContent({
 }: OrgChartContentProps) {
 
   const activePosition = activeId ? findPosition(activeId) : null;
+
+  const [tiers2, setTiers2] = useState({});
+
+  useEffect(() => {
+    async function fetchTiers() {
+      const result = await Tiers();
+      setTiers2(result);
+    }
+
+    fetchTiers();
+  }, []);
+  console.log("tiers", tiers, tiers2);
 
   return (
     <div

@@ -28,10 +28,8 @@ export const initialTiers: Tier[] = [
         id: "position-2",
         title: "Business Operations",
         employees: {
-          count: 1,
-          data: [
-            {id: '3', name: "Alice Johnson", email: "alice.johnson@example.com" },
-          ],
+          count: 0,
+          data: [],
         },
         division: "Operations",
         tierId: "tier-2",
