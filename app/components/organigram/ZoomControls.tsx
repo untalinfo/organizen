@@ -19,12 +19,15 @@ export function ZoomControls({ zoom, setZoom }: ZoomControlsProps) {
       >
         <ZoomOut className="w-5 h-5" />
       </Button>
-      <Button
+      {/* <Button
         className="bg-primary text-primary hover:bg-primary/90 px-8"
         onClick={() => setCreateDialogOpen(true)}
       >
         New position
-      </Button>
+      </Button> */}
+      <p className="bg-primary text-primary hover:bg-primary/90 px-8">
+        Zoom controls
+      </p>
       <Button
         variant="ghost"
         size="icon"
