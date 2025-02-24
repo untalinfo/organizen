@@ -1,23 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OrgChartContent } from "../components/organigram/OrgChartContent";
 import EmployeeList from "../components/organigram/EmployeeList";
 import { ZoomControls } from "../components/organigram/ZoomControls";
 import { useOrgChart } from "../hooks/useOrgChart";
-import { Employee } from "../types/types";
 import {
   TransformComponent,
   TransformWrapper,
 } from "react-zoom-pan-pinch";
+import { useOrgChartStore } from "../store/orgChartStore";
 
 export default function OrgChart() {
   const [employeeSheetOpen, setEmployeeSheetOpen] = useState(false);
-  const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>([]);
+  const [selectedPositionId, setSelectedPositionId] = useState<
+    number | undefined
+  >(undefined);
   const [transformWrapperDisabled, setTransformWrapperDisabled] = useState(false);
+  const { tiers, loadTiers } = useOrgChartStore();
 
   const {
-    tiers,
     activeId,
     findPosition,
     handleDragStart,
@@ -25,11 +27,12 @@ export default function OrgChart() {
     handleDelete,
   } = useOrgChart();
 
-  const handleEmployeeSheetOpen = (employees: {
-    count: number;
-    data: Employee[];
-  }) => {
-    setSelectedEmployees(employees.data);
+   useEffect(() => {
+     loadTiers();
+   }, [loadTiers]);
+
+  const handleEmployeeSheetOpen = (id: number) => {
+    setSelectedPositionId(id);
     setEmployeeSheetOpen(true);
   };
 
@@ -63,7 +66,7 @@ export default function OrgChart() {
         <EmployeeList
           open={employeeSheetOpen}
           onOpenChange={setEmployeeSheetOpen}
-          employees={selectedEmployees}
+          positionId={selectedPositionId ?? 0}
         />
       </TransformWrapper>
     </div>

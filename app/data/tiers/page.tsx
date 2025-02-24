@@ -8,6 +8,5 @@ export default async function Tiers() {
     return <div>Error fetching tiers</div>;
   }
 
-  console.log("tiers", tiers);
   return <pre>{JSON.stringify(tiers, null, 2)}</pre>;
 }
