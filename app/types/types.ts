@@ -17,6 +17,7 @@ export interface Position {
   id: number
   name: string
   divisions?: Division
+  division_id: number
   tier_id: number
   reports_to_id?: number
   position_assignments: PositionAssignment[]
