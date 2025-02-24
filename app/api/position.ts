@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabase/supabaseClient";
+import { toast } from "react-toastify";
 
 export default async function Positions() {
   const { data: positions, error } = await supabase.from('positions').select(
@@ -6,7 +7,7 @@ export default async function Positions() {
   );
 
   if (error) {
-    console.error("Error fetching tiers:", error);
+    toast.error(`Error feching positions: ${error.message}`);
   }
   return JSON.stringify(positions, null, 2);
 }
@@ -16,7 +17,7 @@ export async function PositionById(id: number) {
     `id, name, position_assignments(id, employees(id, full_name, email)))`
   ).eq('id', id).single();
   if (error) {
-    console.error("Error fetching tiers:", error);
+    toast.error(`Error feching position by id: ${error.message}`);
   }
   return position;
 }
@@ -31,7 +32,7 @@ export async function EditPosition(data: EditPositionData): Promise<EditPosition
   const { error } = await supabase.from('positions').upsert(data);
 
   if (error) {
-    console.error("Error editing position:", error);
+    toast.error(`Error edit position: ${error.message}`);
     return null;
   }
   return data;

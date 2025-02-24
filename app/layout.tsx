@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "./components/ui/themeProvider";
 import { ThemeToggle } from "./components/ui/themeToggle";
 import Image from "next/image";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +45,7 @@ export default function RootLayout({
             <ThemeToggle />
           </header>
           {children}
+          <ToastContainer />
         </ThemeProvider>
       </body>
     </html>
