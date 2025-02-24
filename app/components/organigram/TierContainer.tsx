@@ -12,6 +12,8 @@ import type { Tier } from "../../types/types";
 import { PositionCard } from "./PositionCard";
 import { useState } from "react";
 import Xarrow, { Xwrapper } from "react-xarrows";
+import { UpdateTierName } from "@/app/api/tiers";
+import { toast } from "react-toastify";
 
 interface TierContainerProps {
   tier: Tier;
@@ -34,6 +36,17 @@ export function TierContainer({
   });
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(defaultName || `${tier.name}`);
+
+  const handleNameChange = async () => {
+    setIsEditing(false);
+    const updatedTier = await UpdateTierName(tier.id, name);
+    if (updatedTier) {
+      // Optionally update the global state or local state if needed
+      toast.success("Tier name updated successfully");
+    } else {
+      toast.error("Failed to update tier name");
+    }
+  };
 
   const handleCreateNewPosition = () => {
     // const lastPosition = tier.positions[tier.positions.length - 1];
@@ -62,8 +75,8 @@ export function TierContainer({
             className="h-6 w-32"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+            onBlur={handleNameChange}
+            onKeyDown={(e) => e.key === "Enter" && handleNameChange()}
             autoFocus
           />
         ) : (
@@ -87,7 +100,6 @@ export function TierContainer({
           <div className="flex gap-16 justify-center">
             <Xwrapper>
               {tier.positions.map((position) => {
-                console.log('aca', position);
                 return (
                   <div key={position.id} className="relative">
                     <PositionCard
@@ -115,7 +127,8 @@ export function TierContainer({
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>
-                );})}
+                );
+              })}
             </Xwrapper>
           </div>
         </SortableContext>
