@@ -15,6 +15,8 @@ import type { Position } from "../../types/types";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { useOrgChartStore } from "@/app/store/orgChartStore";
+import { EditPosition } from "@/app/api/position";
+import { toast } from "react-toastify";
 
 interface PositionCardProps {
   position: Position;
@@ -57,6 +59,35 @@ export function PositionCard({
     }
   };
 
+  const handleNameChange = async () => {
+    setIsEditing(false);
+    const updatedPosition = await EditPosition({ id: position.id, name });
+    if (updatedPosition) {
+      toast.success("Position name updated successfully");
+    } else {
+      toast.error("Failed to update position name");
+    }
+  };
+
+  const handleDivisionChange = async (value: string) => {
+    console.log('values',value);
+    const selectedDivision = divisions.find(
+      (division) => division.name === value
+    );
+    if (selectedDivision) {
+      const updatedPosition = await EditPosition({
+        id: position.id,
+        division_id: selectedDivision.id,
+      });
+      if (updatedPosition) {
+        // updatePositionDivision(position.id, selectedDivision.id); 
+        toast.success("Position division updated successfully");
+      } else {
+        toast.error("Failed to update position division");
+      }
+    }
+  };
+
   useEffect(() => {
     loadDivisions();
   }, [loadDivisions]);
@@ -89,8 +120,8 @@ export function PositionCard({
             className="h-6 w-32 self-center text-center"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+            onBlur={handleNameChange}
+            onKeyDown={(e) => e.key === "Enter" && handleNameChange()}
             autoFocus
           />
         ) : (
@@ -124,11 +155,14 @@ export function PositionCard({
             </Button>
           </span>
         </div>
-        <Select defaultValue={position.divisions?.name || "Select division"}>
+        <Select
+          defaultValue={position.divisions?.name || "Select division"}
+          onValueChange={handleDivisionChange}
+        >
           <SelectTrigger className="mt-2">
             <SelectValue
               placeholder="Select division"
-              defaultValue={position.divisions?.name || "Select division"}
+              defaultValue={position.divisions?.id || "Select division"}
             />
           </SelectTrigger>
           <SelectContent>
@@ -140,7 +174,7 @@ export function PositionCard({
           </SelectContent>
         </Select>
         <div className="self-end">
-          {id !== '1' && (
+          {id !== "1" && (
             <Button
               variant="ghost"
               size="icon"

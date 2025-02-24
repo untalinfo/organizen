@@ -1,5 +1,6 @@
 import { supabase } from "@/utils/supabase/supabaseClient";
 import { toast } from "react-toastify";
+import { Position } from "../types/types";
 
 export default async function Positions() {
   const { data: positions, error } = await supabase.from('positions').select(
@@ -22,18 +23,30 @@ export async function PositionById(id: number) {
   return position;
 }
 
-interface EditPositionData {
-  id?: number;
-  name: string;
-  // Add other fields as necessary
-}
 
-export async function EditPosition(data: EditPositionData): Promise<EditPositionData | null> {
-  const { error } = await supabase.from('positions').upsert(data);
+export async function EditPosition(data: Partial<Position>): Promise<Position | null> {
+  const updateData: Partial<Position> = {};
+
+  console.log('data que llega', data);
+
+  if (data.name) {
+    updateData.name = data.name;
+  }
+
+  if (data.division_id) {
+    updateData.division_id = data.division_id;
+  }
+
+  const { data: position, error } = await supabase
+    .from('positions')
+    .update(updateData)
+    .eq('id', data.id)
+    .select()
+    .single();
 
   if (error) {
-    toast.error(`Error edit position: ${error.message}`);
+    toast.error(`Error updating position: ${error.message}`);
     return null;
   }
-  return data;
+  return position;
 }
