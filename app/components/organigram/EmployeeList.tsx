@@ -6,35 +6,39 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from "@/app/components/ui/sheet";
-import { Users, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Users } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "../ui/input";
+import { Employees } from "@/app/types/types";
+import { useOrgChartStore } from "@/app/store/orgChartStore";
 
-interface Employee {
-  id: string;
-  name: string;
-  email: string;
-}
 interface EmployeeListProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  employees: Employee[];
+  positionId: number;
 }
 
-
-export default function EmployeeList({ open, onOpenChange, employees }: EmployeeListProps) {
-  const [localEmployees, setLocalEmployees] = useState<Employee[]>(employees);
+export default function EmployeeList({
+  open,
+  onOpenChange,
+  positionId,
+}: EmployeeListProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
+  const [currentEmployee, setCurrentEmployee] = useState<Employees | null>(null);
   const [error, setError] = useState("");
+  const { positionById, loadPositionsById } = useOrgChartStore();
+  const [localEmployees, setLocalEmployees] = useState(
+    positionById.position_assignments
+  );
+
+  console.log("ACAAA", positionById, localEmployees);
 
   useEffect(() => {
-    setLocalEmployees(employees);
-  }, [employees]);
+    setLocalEmployees(positionById.position_assignments);
+  }, [positionById]);
 
-  const handleOpenForm = (employee: Employee | null = null) => {
+  const handleOpenForm = (employee: Employees | null = null) => {
     setCurrentEmployee(employee);
     setIsFormOpen(true);
     setError("");
@@ -64,26 +68,40 @@ export default function EmployeeList({ open, onOpenChange, employees }: Employee
     if (currentEmployee) {
       // Edit existing employee
       setLocalEmployees(
-        employees.map((emp) =>
-          emp.id === currentEmployee.id ? { ...emp, name, email } : emp
+        localEmployees.map((assignment) =>
+          assignment.employees.id === currentEmployee.id
+            ? {
+                ...assignment,
+                employees: { ...assignment.employees, full_name: name, email },
+              }
+            : assignment
         )
       );
     } else {
       // Add new employee
-      const newEmployee: Employee = {
-        id: (employees.length + 1).toString(),
-        name,
+      const newEmployee: Employees = {
+        id: localEmployees.length + 1,
+        full_name: name,
         email,
       };
-      setLocalEmployees([...employees, newEmployee]);
+      setLocalEmployees([
+        ...localEmployees,
+        { id: newEmployee.id, employees: newEmployee },
+      ]);
     }
 
     handleCloseForm();
   };
 
-  const handleDelete = (id: string) => {
-    setLocalEmployees(localEmployees.filter((emp) => emp.id !== id));
+  const handleDelete = (id: number) => {
+    setLocalEmployees(
+      localEmployees.filter((assignment) => assignment.employees.id !== id)
+    );
   };
+
+  useEffect(() => {
+    loadPositionsById(positionId);
+  }, [loadPositionsById, positionId]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -93,11 +111,11 @@ export default function EmployeeList({ open, onOpenChange, employees }: Employee
             <div className="flex items-center gap-2">
               <Users className="w-6 h-6" />
               <SheetTitle className="text-xl font-medium">
-                Employees - Sellers
+                Employees - {`${positionById.name}`}
               </SheetTitle>
             </div>
           </div>
-          <SheetDescription className="text-base">
+          <div className="text-base">
             <div className="flex justify-between items-center">
               <h2 className="text-muted-foreground">List of employees</h2>
               <Button
@@ -107,46 +125,54 @@ export default function EmployeeList({ open, onOpenChange, employees }: Employee
                 New
               </Button>
             </div>
-          </SheetDescription>
+          </div>
         </SheetHeader>
 
         <div className="space-y-2">
-          {localEmployees.length === 0 ? (
+          {localEmployees?.length === 0 ? (
             <p className="text-center text-muted-foreground">
               You have no employees for this position
             </p>
           ) : (
             localEmployees
-              .filter((employee) => employee.id !== currentEmployee?.id)
-              .map((employee) => (
-                <div
-                  key={employee.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg group"
-                >
-                  <div>
-                    <h3 className="font-medium">{employee.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {employee.email}
-                    </p>
+              ?.filter(
+                (assignment) => assignment.employees.id !== currentEmployee?.id
+              )
+              ?.map((assignment) => {
+                const el = assignment.employees;
+                console.log("ACAAA3", el);
+                return (
+                  <div
+                    key={el.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg group"
+                  >
+                    <div>
+                      <h3 className="font-medium">{el.full_name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {el.email}
+                      </p>
+                    </div>
+                    {!isFormOpen && (
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenForm(el)}
+                        >
+                          <Pencil className="w-4 h-4 text-gray-500" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(el.id)}
+                        >
+                          <Trash2 className="w-4 h-4 text-gray-500" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                  {!isFormOpen && <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleOpenForm(employee)}
-                    >
-                      <Pencil className="w-4 h-4 text-gray-500" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(employee.id)}
-                    >
-                      <Trash2 className="w-4 h-4 text-gray-500" />
-                    </Button>
-                  </div>}
-                </div>
-              ))
+                );
+              })
           )}
         </div>
         {/* New Employee Form */}
@@ -164,7 +190,7 @@ export default function EmployeeList({ open, onOpenChange, employees }: Employee
               <Input
                 name="name"
                 placeholder="Employee name"
-                defaultValue={currentEmployee?.name || ""}
+                defaultValue={currentEmployee?.full_name || ""}
                 required
               />
               <div>

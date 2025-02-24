@@ -37,17 +37,17 @@ export function useOrgChart() {
     let targetTierId = over.id
     const overPosition = findPosition(over.id)
     if (overPosition) {
-      targetTierId = overPosition.tierId
+      targetTierId = overPosition.tier_id
     }
 
     setTiers((prevTiers) => {
       const newTiers = [...prevTiers]
-      const oldTierIndex = newTiers.findIndex((t) => t.id === activePosition.tierId)
+      const oldTierIndex = newTiers.findIndex((t) => t.id === activePosition.tier_id)
       const oldTier = newTiers[oldTierIndex]
       const positionIndex = oldTier.positions.findIndex((p) => p.id === activePosition.id)
       const [movedPosition] = oldTier.positions.splice(positionIndex, 1)
 
-      movedPosition.tierId = String(targetTierId)
+      movedPosition.tier_id = Number(targetTierId)
 
       const newTierIndex = newTiers.findIndex((t) => t.id === targetTierId)
       newTiers[newTierIndex].positions.push(movedPosition)
@@ -59,16 +59,11 @@ export function useOrgChart() {
     cb(false);
   }
 
-  const handleDelete = (positionId: string) => {
+  const handleDelete = (positionId: number) => {
     setTiers((prev) => {
       const newTiers = prev.map((tier) => ({
         ...tier,
-        positions: tier.positions
-          .map((position) => ({
-            ...position,
-            subordinates: position.subordinates.filter((subId) => subId !== positionId),
-          }))
-          .filter((p) => p.id !== positionId),
+        positions: tier.positions.filter((p) => p.id !== positionId),
       }))
       return newTiers
     })

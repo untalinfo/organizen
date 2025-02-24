@@ -1,17 +1,15 @@
 import { DndContext, DragOverlay, closestCenter, DragStartEvent, DragEndEvent } from "@dnd-kit/core";
 import { TierContainer } from "./TierContainer";
 import { PositionCard } from "./PositionCard";
-import type { Employee, Position, Tier } from "../../types/types";
-import Tiers from "@/app/api/tiers";
-import { useEffect, useState } from "react";
+import type { Position, Tier } from "../../types/types";
 
 interface OrgChartContentProps {
   tiers: Tier[];
   activeId: string | null;
   onDragStart: (event: DragStartEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
-  onDelete: (id: string) => void;
-  onEmployeeSheetOpen: (employees: { count: number; data: Employee[] }) => void;
+  onDelete: (id: number) => void;
+  onEmployeeSheetOpen?: (id: number) => void;
   findPosition: (id: string) => Position | undefined;
 }
 
@@ -25,18 +23,6 @@ export function OrgChartContent({
   findPosition,
 }: OrgChartContentProps) {
   const activePosition = activeId ? findPosition(activeId) : null;
-
-  const [tiers2, setTiers2] = useState({});
-
-  useEffect(() => {
-    async function fetchTiers() {
-      const result = await Tiers();
-      setTiers2(result);
-    }
-
-    fetchTiers();
-  }, []);
-  console.log("tiers", tiers, tiers2);
 
   return (
     <div
@@ -76,7 +62,7 @@ export function OrgChartContent({
               <PositionCard
                 position={activePosition}
                 accentColor={
-                  activePosition.tierId === "tier-1" ? "#37c99f" : "#fab8c3"
+                  activePosition.tier_id === 1 ? "#37c99f" : "#fab8c3"
                 }
               />
             </div>

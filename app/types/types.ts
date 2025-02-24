@@ -1,22 +1,29 @@
-export interface Employee {
-  id: string;
-  name: string;
-  email: string;
+export interface Employees {
+  id: number
+  full_name: string
+  email: string
+}
+
+export interface Division {
+  id: number
+  name: string
+}
+
+export interface PositionAssignment  {
+  id: number
+  employees: Employees
 }
 export interface Position {
-  id: string
-  title: string
-  employees: {
-    count: number
-    data: Employee[]
-  }
-  division?: string
-  tierId: string
-  subordinates: string[]
+  id: number
+  name: string
+  divisions?: Division
+  tier_id: number
+  reports_to_id?: number
+  position_assignments: PositionAssignment[]
 }
 
 export interface Tier {
-  id: string
-  title: string
+  id: number
+  name: string
   positions: Position[]
 }
