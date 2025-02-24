@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 interface OrgChartContentProps {
   tiers: Tier[];
   activeId: string | null;
-  zoom: number;
   onDragStart: (event: DragStartEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
   onDelete: (id: string) => void;
@@ -19,14 +18,12 @@ interface OrgChartContentProps {
 export function OrgChartContent({
   tiers,
   activeId,
-  zoom,
   onDragStart,
   onDragEnd,
   onDelete,
   onEmployeeSheetOpen,
   findPosition,
 }: OrgChartContentProps) {
-
   const activePosition = activeId ? findPosition(activeId) : null;
 
   const [tiers2, setTiers2] = useState({});
@@ -45,7 +42,6 @@ export function OrgChartContent({
     <div
       className="w-full"
       style={{
-        transform: `scale(${zoom / 100})`,
         transformOrigin: "top center",
       }}
     >
@@ -64,7 +60,6 @@ export function OrgChartContent({
                 onDelete={onDelete}
                 onEmployeeSheetOpen={onEmployeeSheetOpen}
               />
-              
             </div>
           ))}
         </div>

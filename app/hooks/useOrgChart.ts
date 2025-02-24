@@ -14,11 +14,12 @@ export function useOrgChart() {
     }
   }
 
-  const handleDragStart = (event: { active: { id: UniqueIdentifier } }) => {
+  const handleDragStart = (event: { active: { id: UniqueIdentifier } }, cb: (value: boolean) => void) => {
     setActiveId(event.active.id)
+    cb(true);
   }
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent, cb: (v: boolean)=> void) => {
 
     const { active, over } = event
 
@@ -55,6 +56,7 @@ export function useOrgChart() {
     })
 
     setActiveId(null)
+    cb(false);
   }
 
   const handleDelete = (positionId: string) => {
