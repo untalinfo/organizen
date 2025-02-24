@@ -32,8 +32,6 @@ export default function EmployeeList({
     positionById.position_assignments
   );
 
-  console.log("ACAAA", positionById, localEmployees);
-
   useEffect(() => {
     setLocalEmployees(positionById.position_assignments);
   }, [positionById]);
@@ -140,7 +138,6 @@ export default function EmployeeList({
               )
               ?.map((assignment) => {
                 const el = assignment.employees;
-                console.log("ACAAA3", el);
                 return (
                   <div
                     key={el.id}
