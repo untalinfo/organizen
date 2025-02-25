@@ -2,37 +2,24 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { useState } from "react";
 import { CreateNewModal } from "./CreateNewModal";
+import { useControls } from "react-zoom-pan-pinch";
 
-interface ZoomControlsProps {
-  zoom: number;
-  setZoom: (zoom: number) => void;
-}
 
-export function ZoomControls({ zoom, setZoom }: ZoomControlsProps) {
+export function ZoomControls() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const { zoomIn, zoomOut, resetTransform } = useControls();
   return (
     <div className="fixed bottom-6 right-6 flex items-center gap-4 bg-background p-2 rounded-lg shadow-lg">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setZoom(Math.max(50, zoom - 10))}
-      >
+      <Button variant="ghost" size="icon" onClick={() => zoomOut()}>
         <ZoomOut className="w-5 h-5" />
       </Button>
-      {/* <Button
-        className="bg-primary text-primary hover:bg-primary/90 px-8"
-        onClick={() => setCreateDialogOpen(true)}
+      <p
+        onClick={() => resetTransform()}
+        className="bg-primary text-primary hover:bg-primary/90 px-8 cursor-pointer rounded-lg"
       >
-        New position
-      </Button> */}
-      <p className="bg-primary text-primary hover:bg-primary/90 px-8">
-        Zoom controls
+        Reset
       </p>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setZoom(Math.min(150, zoom + 10))}
-      >
+      <Button variant="ghost" size="icon" onClick={() => zoomIn()}>
         <ZoomIn className="w-5 h-5" />
       </Button>
       <CreateNewModal

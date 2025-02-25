@@ -1,32 +1,27 @@
 import { supabase } from "@/utils/supabase/supabaseClient";
+import { Tier } from "../types/types";
+import { toast } from "react-toastify";
 
-export default async function Tiers() {
-  const { data: tiers, error } = await supabase.from('tiers').select('*');
+export default async function getTiers() {
+  const { data: tiers, error } = await supabase.from('tiers').select(`id, name, positions(id, name, division_id, divisions:division_id(id, name), reports_to_id, tier_id, position_assignments(id, employees(id, full_name, email)))`) as { data: Tier[] | null, error: Error | null };
 
   if (error) {
-    console.error("Error fetching tiers:", error);
+    toast.error(`Error fetching tiers: ${error.message}`);
   }
-  return JSON.stringify(tiers, null, 2);
+  return tiers;
 }
 
-interface Tier {
-  id: number;
-  name: string;
-  description: string;
-  // Add other fields as necessary
-}
 
-interface CreateTierData {
-  name: string;
-  description: string;
-  // Add other fields as necessary
-}
-
-export async function CreateTier(data: CreateTierData): Promise<Tier | null> {
-  const { data: tier, error } = await supabase.from('tiers').insert(data).single();
+export async function fetchUpdateTierName(id: number, name: string): Promise<Tier | null> {
+  const { data: tier, error } = await supabase
+    .from('tiers')
+    .update({ name })
+    .eq('id', id)
+    .select()
+    .single();
 
   if (error) {
-    console.error("Error creating tier:", error);
+    toast.error(`Error update name tier: ${error.message}`);
     return null;
   }
   return tier;

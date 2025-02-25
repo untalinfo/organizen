@@ -12,21 +12,23 @@ import {
 } from "@/app/components/ui/select";
 import { Button } from "@/app/components/ui/button";
 import type { Position } from "../../types/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
+import { useOrgChartStore } from "@/app/store/orgChartStore";
+import { fetchEditPosition, DeletePosition } from "@/app/api/position";
+import { toast } from "react-toastify";
 
 interface PositionCardProps {
   position: Position;
   accentColor: string;
-  onDelete?: (id: string) => void;
-  onEmployeeSheetOpen?: (employees: Position["employees"]) => void;
+  onDelete?: (id: number) => void;
+  onEmployeeSheetOpen?: (id: number) => void;
   id?: string;
 }
 
 export function PositionCard({
   position,
   accentColor,
-  onDelete,
   onEmployeeSheetOpen,
   id,
 }: PositionCardProps) {
@@ -40,7 +42,8 @@ export function PositionCard({
   } = useSortable({ id: position.id });
 
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(`${position?.title}`);
+  const [name, setName] = useState(`${position?.name}`);
+  const { divisionsList, loadDivisions } = useOrgChartStore();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -48,24 +51,61 @@ export function PositionCard({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  console.log("position", position);
   const handleButtonClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     if (onEmployeeSheetOpen) {
-      onEmployeeSheetOpen(position.employees);
+      onEmployeeSheetOpen(position.id);
     }
   };
 
+  const handleNameChange = async () => {
+    setIsEditing(false);
+    const updatedPosition = await fetchEditPosition({ id: position.id, name });
+    if (updatedPosition) {
+      toast.success("Position name updated successfully");
+    } else {
+      toast.error("Failed to update position name");
+    }
+  };
+
+  const handleDivisionChange = async (value: string) => {
+    const selectedDivision = divisionsList.find(
+      (division) => division.name === value
+    );
+    if (selectedDivision) {
+      const updatedPosition = await fetchEditPosition({
+        id: position.id,
+        division_id: selectedDivision.id,
+      });
+      if (updatedPosition) {
+        // updatePositionDivision(position.id, selectedDivision.id); 
+        toast.success("Position division updated successfully");
+      } else {
+        toast.error("Failed to update position division");
+      }
+    }
+  };
+
+  const handleDeletePosition = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      await DeletePosition(position.id);
+      toast.success("Position deleted successfully");
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      toast.error(`Failed to delete position: ${errorMessage}`);
+    }
+  };
+
+  useEffect(() => {
+    loadDivisions();
+  }, [loadDivisions]);
   return (
     <div
       ref={setNodeRef}
       style={style}
       className="bg-card text-card-foreground rounded-lg shadow min-w-[200px] cursor-pointer"
       id={id}
-      onClick={(event) => {
-        event.stopPropagation();
-        alert("Position Edited");
-      }}
     >
       <div
         className="h-1 rounded-t-lg"
@@ -78,7 +118,6 @@ export function PositionCard({
           size="icon"
           onClick={(event) => {
             event.stopPropagation();
-            alert("Position Edited");
           }}
           {...attributes}
           {...listeners}
@@ -90,8 +129,8 @@ export function PositionCard({
             className="h-6 w-32 self-center text-center"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+            onBlur={handleNameChange}
+            onKeyDown={(e) => e.key === "Enter" && handleNameChange()}
             autoFocus
           />
         ) : (
@@ -112,7 +151,7 @@ export function PositionCard({
         <div className="text-sm">
           <span>Openings:</span>
           <span className="text-red-500 ml-1 flex items-center justify-center">
-            {position.employees.count} employees
+            {position?.position_assignments?.length} employees
             <Button
               variant="ghost"
               size="icon"
@@ -125,36 +164,30 @@ export function PositionCard({
             </Button>
           </span>
         </div>
-        <Select defaultValue={position.division}>
+        <Select
+          defaultValue={position.divisions?.name || "Select division"}
+          onValueChange={handleDivisionChange}
+        >
           <SelectTrigger className="mt-2">
-            <SelectValue placeholder="Select division" />
+            <SelectValue
+              placeholder="Select division"
+              defaultValue={position.divisions?.id || "Select division"}
+            />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="sales">Sales</SelectItem>
-            <SelectItem value="marketing">Marketing</SelectItem>
-            <SelectItem value="engineering">Engineering</SelectItem>
+            {divisionsList.map((division) => (
+              <SelectItem key={division.id} value={division.name}>
+                {division.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <div className="self-end">
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            onClick={(event) => {
-              event.stopPropagation();
-              alert("Position Edited");
-            }}
-          >
-            <Pencil className="h-4 w-4 text-muted-foreground" />
-          </Button> */}
-          {id !== "position-1" && (
+          {id !== "1" && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete?.(position.id);
-                alert("Position deleted");
-              }}
+              onClick={(event) => handleDeletePosition(event)}
             >
               <Trash2 className="w-4 h-4 text-muted-foreground" />
             </Button>

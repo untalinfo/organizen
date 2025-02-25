@@ -8,17 +8,19 @@ import {
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import type { Employee, Tier } from "../../types/types";
+import type { Tier } from "../../types/types";
 import { PositionCard } from "./PositionCard";
 import { useState } from "react";
 import Xarrow, { Xwrapper } from "react-xarrows";
+import { fetchUpdateTierName } from "@/app/api/tiers";
+import { toast } from "react-toastify";
 
 interface TierContainerProps {
   tier: Tier;
   tiers: Tier[];
   accentColor: string;
-  onDelete: (id: string) => void;
-  onEmployeeSheetOpen: (employees: { count: number; data: Employee[] }) => void;
+  onDelete: (id: number) => void;
+  onEmployeeSheetOpen?: (id: number) => void;
   defaultName?: string;
 }
 
@@ -33,21 +35,31 @@ export function TierContainer({
     id: tier.id,
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(defaultName || `${tier.title}`);
+  const [name, setName] = useState(defaultName || `${tier.name}`);
+
+  const handleNameChange = async () => {
+    setIsEditing(false);
+    const updatedTier = await fetchUpdateTierName(tier.id, name);
+    if (updatedTier) {
+      toast.success("Tier name updated successfully");
+    } else {
+      toast.error("Failed to update tier name");
+    }
+  };
 
   const handleCreateNewPosition = () => {
-    const lastPosition = tier.positions[tier.positions.length - 1];
-    const lastPositionId = parseInt(lastPosition.id.split("-")[1]);
-    const newPositionId = `position-${lastPositionId + 1}`;
+    // const lastPosition = tier.positions[tier.positions.length - 1];
+    // const lastPositionId = parseInt(lastPosition.id.split("-")[1]);
+    // const newPositionId = `position-${lastPositionId + 1}`;
 
-    tier.positions.push({
-      id: newPositionId,
-      title: "New Position",
-      employees: { count: 0, data: [] },
-      division: "Operations",
-      tierId: tier.id,
-      subordinates: [],
-    });
+    // tier.positions.push({
+    //   id: newPositionId,
+    //   title: "New Position",
+    //   employees: { count: 0, data: [] },
+    //   division: "Operations",
+    //   tierId: tier.id,
+    //   subordinates: [],
+    // });
     alert("New position created");
   }
 
@@ -62,8 +74,8 @@ export function TierContainer({
             className="h-6 w-32"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+            onBlur={handleNameChange}
+            onKeyDown={(e) => e.key === "Enter" && handleNameChange()}
             autoFocus
           />
         ) : (
@@ -86,31 +98,36 @@ export function TierContainer({
         >
           <div className="flex gap-16 justify-center">
             <Xwrapper>
-              {tier.positions.map((position) => (
-                <div key={position.id} className="relative">
-                  <PositionCard
-                    position={position}
-                    accentColor={accentColor}
-                    onDelete={onDelete}
-                    onEmployeeSheetOpen={onEmployeeSheetOpen}
-                    id={`${position.id}`}
-                  />
-                  <Xarrow
-                    start={`position-1`}
-                    end={`${position.id}`}
-                    color="grey"
-                    showHead={false}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-white shadow"
-                    onClick={handleCreateNewPosition}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+              {tier.positions.map((position) => {
+                return (
+                  <div key={position.id} className="relative">
+                    <PositionCard
+                      position={position}
+                      accentColor={accentColor}
+                      onDelete={onDelete}
+                      onEmployeeSheetOpen={onEmployeeSheetOpen}
+                      id={`${position.id}`}
+                    />
+                    {position.reports_to_id && (
+                      <Xarrow
+                        start={`${position.reports_to_id}`}
+                        end={`${position.id}`}
+                        color="grey"
+                        showHead={false}
+                      />
+                    )}
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-white shadow"
+                      onClick={handleCreateNewPosition}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                );
+              })}
             </Xwrapper>
           </div>
         </SortableContext>
