@@ -80,7 +80,6 @@ export function PositionCard({
         division_id: selectedDivision.id,
       });
       if (updatedPosition) {
-        // updatePositionDivision(position.id, selectedDivision.id);
         toast.success("Position division updated successfully");
       } else {
         toast.error("Failed to update position division");
@@ -96,6 +95,7 @@ export function PositionCard({
   useEffect(() => {
     loadDivisions();
   }, [loadDivisions]);
+
   return (
     <div
       ref={setNodeRef}

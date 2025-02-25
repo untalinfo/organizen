@@ -51,7 +51,6 @@ export function OrgChartContent({
           {activeId && activePosition ? (
             <div
               style={{
-                transform: "translate(-50%, -50%)",
                 pointerEvents: "none",
                 zIndex: 1000,
               }}
