@@ -11,23 +11,8 @@ export default async function getTiers() {
   return tiers;
 }
 
-interface CreateTierData {
-  name: string;
-  description: string;
-  // Add other fields as necessary
-}
 
-export async function CreateTier(data: CreateTierData): Promise<Tier | null> {
-  const { data: tier, error } = await supabase.from('tiers').insert(data).single();
-
-  if (error) {
-    toast.error(`Error creating tier: ${error.message}`);
-    return null;
-  }
-  return tier;
-}
-
-export async function UpdateTierName(id: number, name: string): Promise<Tier | null> {
+export async function fetchUpdateTierName(id: number, name: string): Promise<Tier | null> {
   const { data: tier, error } = await supabase
     .from('tiers')
     .update({ name })

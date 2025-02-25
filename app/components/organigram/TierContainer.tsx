@@ -12,7 +12,7 @@ import type { Tier } from "../../types/types";
 import { PositionCard } from "./PositionCard";
 import { useState } from "react";
 import Xarrow, { Xwrapper } from "react-xarrows";
-import { UpdateTierName } from "@/app/api/tiers";
+import { fetchUpdateTierName } from "@/app/api/tiers";
 import { toast } from "react-toastify";
 
 interface TierContainerProps {
@@ -39,9 +39,8 @@ export function TierContainer({
 
   const handleNameChange = async () => {
     setIsEditing(false);
-    const updatedTier = await UpdateTierName(tier.id, name);
+    const updatedTier = await fetchUpdateTierName(tier.id, name);
     if (updatedTier) {
-      // Optionally update the global state or local state if needed
       toast.success("Tier name updated successfully");
     } else {
       toast.error("Failed to update tier name");
