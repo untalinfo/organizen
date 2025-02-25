@@ -28,7 +28,7 @@ export async function fetchEditPosition(data: Partial<Position>): Promise<Positi
   return position;
 }
 
-export async function DeletePosition(id: number) {
+export async function fetchDeletePosition(id: number) {
   // Eliminar las filas relacionadas en position_assignments
   const { error: deleteAssignmentsError } = await supabase
     .from('position_assignments')
@@ -52,6 +52,7 @@ export async function DeletePosition(id: number) {
   }
 
   toast.success('Position deleted successfully');
+  return true
 }
 
 export async function fetchCreateNewPosition(reports_to_id: number, current_tier_id: number): Promise<Position | null> {

@@ -27,6 +27,7 @@ interface TierContainerProps {
 
 export function TierContainer({
   tier,
+  tiers,
   accentColor,
   onDelete,
   onEmployeeSheetOpen,
@@ -55,6 +56,12 @@ export function TierContainer({
     current_tier_id: number
   ) => {
     createNewPosition(reports_to_id, current_tier_id);
+  };
+
+  const hasSubpositions = (positionId: number) => {
+    return tiers.some((tier) =>
+      tier.positions.some((position) => position.reports_to_id === positionId)
+    );
   };
 
   return (
@@ -93,6 +100,7 @@ export function TierContainer({
           <div className="flex gap-16 justify-center">
             <Xwrapper>
               {tier.positions.map((position) => {
+                const hasSubpos = hasSubpositions(position.id);
                 return (
                   <div key={position.id} className="relative">
                     <PositionCard
@@ -101,6 +109,7 @@ export function TierContainer({
                       onDelete={onDelete}
                       onEmployeeSheetOpen={onEmployeeSheetOpen}
                       id={`${position.id}`}
+                      hasSubpositions={hasSubpos}
                     />
                     {position.reports_to_id && (
                       <Xarrow
@@ -115,7 +124,9 @@ export function TierContainer({
                       variant="ghost"
                       size="icon"
                       className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-white shadow"
-                      onClick={()=>handleCreateNewPosition(position.id, tier.id)}
+                      onClick={() =>
+                        handleCreateNewPosition(position.id, tier.id)
+                      }
                     >
                       <Plus className="w-4 h-4" />
                     </Button>

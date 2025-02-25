@@ -3,7 +3,7 @@ import { Division, Employees, Position, PositionAssignment, Tier, } from "../typ
 import getTiers from "../api/tiers";
 import getDivisions from "../api/divisions";
 import fetchCreateEmployee, { fetchDeleteEmployee, fetchEditEmployee } from "../api/employee";
-import { fetchCreateNewPosition, fetchEditPosition } from "../api/position";
+import { fetchCreateNewPosition, fetchDeletePosition, fetchEditPosition } from "../api/position";
 import { UniqueIdentifier } from "@dnd-kit/core";
 
 interface PositionByIdProps {
@@ -30,6 +30,7 @@ interface OrgChartState {
   editEmployee: (position_id: number, employee: Employees) => Promise<void>;
   EditPosition: (activePosition: Position, targetTierId: UniqueIdentifier) => Promise<void>;
   createNewPosition: (reports_to_id: number, current_tier_id: number) => Promise<void>;
+  deletePosition: (id: number) => Promise<void>;
 }
 
 export const useOrgChartStore = create<OrgChartState>((set, get) => ({
@@ -116,6 +117,17 @@ export const useOrgChartStore = create<OrgChartState>((set, get) => ({
   createNewPosition: async (reports_to_id: number, current_tier_id: number) => {
     await fetchCreateNewPosition(reports_to_id, current_tier_id);
     await get().loadTiers();
+  },
+  deletePosition: async (id: number) => {
+    const success = await fetchDeletePosition(id);
+    if (success) {
+      set(({ tiers }) => ({
+        tiers: tiers.map((tier) => ({
+          ...tier,
+          positions: tier.positions.filter((position) => position.id !== id),
+        })),
+      }));
+    }
   },
 
 }));
