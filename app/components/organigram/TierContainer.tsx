@@ -73,7 +73,7 @@ export function TierContainer({
       ref={setNodeRef}
       className="relative mb-4 min-h-[200px] rounded-lg border-2 border-dashed border-gray-200 p-4"
     >
-      <div className="absolute -top-3 left-4 flex items-center gap-2 bg-white px-2">
+      <div className="absolute -top-3 left-4 flex items-center gap-2 bg-card px-2">
         {isEditing ? (
           <Input
             className="h-6 w-32"
@@ -126,12 +126,12 @@ export function TierContainer({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-white shadow"
+                      className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-card shadow"
                       onClick={() =>
                         handleCreateNewPosition(position.id, tier.id)
                       }
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-4 h-4 bg-backgroud" />
                     </Button>
                   </div>
                 );
