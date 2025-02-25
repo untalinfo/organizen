@@ -46,16 +46,6 @@ export function useOrgChart() {
     cb(false);
   }
 
-  const handleDelete = (positionId: number) => {
-    console.log("DELETE", positionId)
-    // setTiers((prev) => {
-    //   const newTiers = prev.map((tier) => ({
-    //     ...tier,
-    //     positions: tier.positions.filter((p) => p.id !== positionId),
-    //   }))
-    //   return newTiers
-    // })
-  }
 
   return {
     tiers,
@@ -63,7 +53,6 @@ export function useOrgChart() {
     findPosition,
     handleDragStart,
     handleDragEnd,
-    handleDelete,
   }
 }
 

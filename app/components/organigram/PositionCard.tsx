@@ -21,7 +21,6 @@ import { toast } from "react-toastify";
 interface PositionCardProps {
   position: Position;
   accentColor: string;
-  onDelete?: (id: number) => void;
   onEmployeeSheetOpen?: (id: number) => void;
   id?: string;
   hasSubpositions?: boolean;

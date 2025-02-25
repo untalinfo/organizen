@@ -20,7 +20,6 @@ interface TierContainerProps {
   tier: Tier;
   tiers: Tier[];
   accentColor: string;
-  onDelete: (id: number) => void;
   onEmployeeSheetOpen?: (id: number) => void;
   defaultName?: string;
 }
@@ -29,7 +28,6 @@ export function TierContainer({
   tier,
   tiers,
   accentColor,
-  onDelete,
   onEmployeeSheetOpen,
   defaultName = "",
 }: TierContainerProps) {
@@ -106,7 +104,6 @@ export function TierContainer({
                     <PositionCard
                       position={position}
                       accentColor={accentColor}
-                      onDelete={onDelete}
                       onEmployeeSheetOpen={onEmployeeSheetOpen}
                       id={`${position.id}`}
                       hasSubpositions={hasSubpos}
