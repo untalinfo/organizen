@@ -3,7 +3,7 @@ import { Tier } from "../types/types";
 import { toast } from "react-toastify";
 
 export default async function getTiers() {
-  const { data: tiers, error } = await supabase.from('tiers').select(`id, name, positions(id, name, division_id, divisions(id, name), reports_to_id, tier_id, position_assignments(id, employees(id, full_name, email)))`);
+  const { data: tiers, error } = await supabase.from('tiers').select(`id, name, positions(id, name, division_id, divisions:division_id(id, name), reports_to_id, tier_id, position_assignments(id, employees(id, full_name, email)))`) as { data: Tier[] | null, error: Error | null };
 
   if (error) {
     toast.error(`Error fetching tiers: ${error.message}`);

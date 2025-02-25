@@ -10,8 +10,9 @@ import {
 import { Pencil, Trash2, Users } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "../ui/input";
-import { Employees, Position } from "@/app/types/types";
+import { Employees, Position, PositionAssignment } from "@/app/types/types";
 import { useOrgChartStore } from "@/app/store/orgChartStore";
+
 
 interface EmployeeListProps {
   open: boolean;
@@ -27,7 +28,8 @@ export default function EmployeeList({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<Employees | null>(null);
   const [error, setError] = useState("");
-  const { getPositionById } = useOrgChartStore();
+  const { getPositionById, createNewEmployee, deleteEmployee, editEmployee } =
+    useOrgChartStore();
   const [localPosition, setLocalPosition] = useState<Position | undefined>(undefined);
 
   useEffect(() => {
@@ -60,39 +62,23 @@ export default function EmployeeList({
       setError("Please enter a valid email address");
       return;
     }
+    const dataEmployee: Employees = {
+      full_name: name,
+      email,
+    };
 
     if (currentEmployee) {
-      // Edit existing employee
-      setLocalEmployees(
-        localEmployees.map((assignment) =>
-          assignment.employees.id === currentEmployee.id
-            ? {
-                ...assignment,
-                employees: { ...assignment.employees, full_name: name, email },
-              }
-            : assignment
-        )
-      );
+      dataEmployee.id = currentEmployee.id;
+      editEmployee(positionId, dataEmployee);
     } else {
-      // Add new employee
-      const newEmployee: Employees = {
-        id: localEmployees.length + 1,
-        full_name: name,
-        email,
-      };
-      setLocalEmployees([
-        ...localEmployees,
-        { id: newEmployee.id, employees: newEmployee },
-      ]);
+      createNewEmployee(dataEmployee, positionId);
     }
 
     handleCloseForm();
   };
 
-  const handleDelete = (id: number) => {
-    setLocalEmployees(
-      localEmployees.filter((assignment) => assignment.employees.id !== id)
-    );
+  const handleDelete = (positionId: number, position_assignments: PositionAssignment) => {
+    deleteEmployee(positionId, position_assignments);
   };
 
 
@@ -156,7 +142,7 @@ export default function EmployeeList({
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleDelete(el.id)}
+                          onClick={() => handleDelete(positionId, assignment)}
                         >
                           <Trash2 className="w-4 h-4 text-gray-500" />
                         </Button>

@@ -16,8 +16,6 @@ export default async function Positions() {
 export async function EditPosition(data: Partial<Position>): Promise<Position | null> {
   const updateData: Partial<Position> = {};
 
-  console.log('data que llega', data);
-
   if (data.name) {
     updateData.name = data.name;
   }
