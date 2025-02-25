@@ -26,3 +26,30 @@ export async function fetchUpdateTierName(id: number, name: string): Promise<Tie
   }
   return tier;
 }
+
+export async function fetchDeleteTier(id: number){
+  // Eliminar las posiciones relacionadas con el tier
+  const { error: deletePositionsError } = await supabase
+    .from('positions')
+    .delete()
+    .eq('tier_id', id);
+
+  if (deletePositionsError) {
+    toast.error(`Error deleting positions in tier: ${deletePositionsError.message}`);
+    return false;
+  }
+
+  // Eliminar el tier
+  const { error: deleteTierError } = await supabase
+    .from('tiers')
+    .delete()
+    .eq('id', id);
+
+  if (deleteTierError) {
+    toast.error(`Error deleting tier: ${deleteTierError.message}`);
+    return false;
+  }
+
+  toast.success('Tier deleted successfully');
+  return true;
+}

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { Division, Employees, Position, PositionAssignment, Tier, } from "../types/types";
-import getTiers from "../api/tiers";
+import getTiers, { fetchDeleteTier } from "../api/tiers";
 import getDivisions from "../api/divisions";
 import fetchCreateEmployee, { fetchDeleteEmployee, fetchEditEmployee } from "../api/employee";
 import { fetchCreateNewPosition, fetchDeletePosition, fetchEditPosition } from "../api/position";
@@ -31,6 +31,7 @@ interface OrgChartState {
   EditPosition: (activePosition: Position, targetTierId: UniqueIdentifier) => Promise<void>;
   createNewPosition: (reports_to_id: number, current_tier_id: number) => Promise<void>;
   deletePosition: (id: number) => Promise<void>;
+  deleteTier: (id: number) => Promise<void>;
 }
 
 export const useOrgChartStore = create<OrgChartState>((set, get) => ({
@@ -126,6 +127,14 @@ export const useOrgChartStore = create<OrgChartState>((set, get) => ({
           ...tier,
           positions: tier.positions.filter((position) => position.id !== id),
         })),
+      }));
+    }
+  },
+  deleteTier: async (id: number) => {
+    const success = await fetchDeleteTier(id);
+    if (success) {
+      set(({ tiers }) => ({
+        tiers: tiers.filter((tier) => tier.id !== id),
       }));
     }
   },

@@ -5,7 +5,7 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import type { Tier } from "../../types/types";
@@ -36,7 +36,7 @@ export function TierContainer({
   });
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(defaultName || `${tier.name}`);
-  const { createNewPosition } = useOrgChartStore();
+  const { createNewPosition, deleteTier } = useOrgChartStore();
 
   const handleNameChange = async () => {
     setIsEditing(false);
@@ -61,6 +61,12 @@ export function TierContainer({
       tier.positions.some((position) => position.reports_to_id === positionId)
     );
   };
+
+  const handleDeleteTier = async () => {
+    await deleteTier(tier.id);
+  };
+
+  const isTierEmpty = tier.positions.length === 0;
 
   return (
     <div
@@ -134,6 +140,16 @@ export function TierContainer({
           </div>
         </SortableContext>
       </div>
+      {isTierEmpty && (
+        <div className="flex flex-col justify-center items-center h-full">
+          <p className="mb-2 text-lg text-gray-500">
+            Puedes eliminar este Tier vacio:{" "}
+          </p>
+          <Button variant="ghost" size="lg" onClick={handleDeleteTier}>
+            <Trash2 className="w-8 h-8 text-muted-foreground" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
