@@ -43,7 +43,7 @@ export function PositionCard({
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(`${position?.name}`);
-  const { divisions, loadDivisions } = useOrgChartStore();
+  const { divisionsList, loadDivisions } = useOrgChartStore();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -69,8 +69,7 @@ export function PositionCard({
   };
 
   const handleDivisionChange = async (value: string) => {
-    console.log('values',value);
-    const selectedDivision = divisions.find(
+    const selectedDivision = divisionsList.find(
       (division) => division.name === value
     );
     if (selectedDivision) {
@@ -176,7 +175,7 @@ export function PositionCard({
             />
           </SelectTrigger>
           <SelectContent>
-            {divisions.map((division) => (
+            {divisionsList.map((division) => (
               <SelectItem key={division.id} value={division.name}>
                 {division.name}
               </SelectItem>
