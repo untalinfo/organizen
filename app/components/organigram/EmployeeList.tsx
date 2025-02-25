@@ -62,15 +62,18 @@ export default function EmployeeList({
       setError("Please enter a valid email address");
       return;
     }
+
     const dataEmployee: Employees = {
       full_name: name,
       email,
     };
 
     if (currentEmployee) {
+      // Edit employee
       dataEmployee.id = currentEmployee.id;
       editEmployee(positionId, dataEmployee);
     } else {
+      // Create new employee
       createNewEmployee(dataEmployee, positionId);
     }
 

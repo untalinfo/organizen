@@ -8,7 +8,6 @@ interface OrgChartContentProps {
   activeId: number | null;
   onDragStart: (event: DragStartEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
-  onDelete: (id: number) => void;
   onEmployeeSheetOpen?: (id: number) => void;
   findPosition: (id: number) => Position | undefined;
 }
@@ -18,7 +17,6 @@ export function OrgChartContent({
   activeId,
   onDragStart,
   onDragEnd,
-  onDelete,
   onEmployeeSheetOpen,
   findPosition,
 }: OrgChartContentProps) {
@@ -43,7 +41,6 @@ export function OrgChartContent({
                 tier={tier}
                 tiers={tiers}
                 accentColor={index === 0 ? "#37c99f" : "#fab8c3"}
-                onDelete={onDelete}
                 onEmployeeSheetOpen={onEmployeeSheetOpen}
               />
             </div>
@@ -54,7 +51,6 @@ export function OrgChartContent({
           {activeId && activePosition ? (
             <div
               style={{
-                transform: "translate(-50%, -50%)",
                 pointerEvents: "none",
                 zIndex: 1000,
               }}

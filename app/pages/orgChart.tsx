@@ -25,7 +25,6 @@ export default function OrgChart() {
     findPosition,
     handleDragStart,
     handleDragEnd,
-    handleDelete,
   } = useOrgChart();
 
   useEffect(() => {
@@ -57,7 +56,6 @@ export default function OrgChart() {
             onDragEnd={(event) =>
               handleDragEnd(event, setTransformWrapperDisabled)
             }
-            onDelete={handleDelete}
             onEmployeeSheetOpen={handleEmployeeSheetOpen}
             findPosition={findPosition}
           />

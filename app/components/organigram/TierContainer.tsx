@@ -5,7 +5,7 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import type { Tier } from "../../types/types";
@@ -14,20 +14,20 @@ import { useState } from "react";
 import Xarrow, { Xwrapper } from "react-xarrows";
 import { fetchUpdateTierName } from "@/app/api/tiers";
 import { toast } from "react-toastify";
+import { useOrgChartStore } from "@/app/store/orgChartStore";
 
 interface TierContainerProps {
   tier: Tier;
   tiers: Tier[];
   accentColor: string;
-  onDelete: (id: number) => void;
   onEmployeeSheetOpen?: (id: number) => void;
   defaultName?: string;
 }
 
 export function TierContainer({
   tier,
+  tiers,
   accentColor,
-  onDelete,
   onEmployeeSheetOpen,
   defaultName = "",
 }: TierContainerProps) {
@@ -36,6 +36,7 @@ export function TierContainer({
   });
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(defaultName || `${tier.name}`);
+  const { createNewPosition, deleteTier } = useOrgChartStore();
 
   const handleNameChange = async () => {
     setIsEditing(false);
@@ -43,32 +44,36 @@ export function TierContainer({
     if (updatedTier) {
       toast.success("Tier name updated successfully");
     } else {
-      toast.error("Failed to update tier name");
+      toast.error("Failed to update tier name, duplicate name found");
+      setName(tier.name);
     }
   };
 
-  const handleCreateNewPosition = () => {
-    // const lastPosition = tier.positions[tier.positions.length - 1];
-    // const lastPositionId = parseInt(lastPosition.id.split("-")[1]);
-    // const newPositionId = `position-${lastPositionId + 1}`;
+  const handleCreateNewPosition = (
+    reports_to_id: number,
+    current_tier_id: number
+  ) => {
+    createNewPosition(reports_to_id, current_tier_id);
+  };
 
-    // tier.positions.push({
-    //   id: newPositionId,
-    //   title: "New Position",
-    //   employees: { count: 0, data: [] },
-    //   division: "Operations",
-    //   tierId: tier.id,
-    //   subordinates: [],
-    // });
-    alert("New position created");
-  }
+  const hasSubpositions = (positionId: number) => {
+    return tiers.some((tier) =>
+      tier.positions.some((position) => position.reports_to_id === positionId)
+    );
+  };
+
+  const handleDeleteTier = async () => {
+    await deleteTier(tier.id);
+  };
+
+  const isTierEmpty = tier.positions.length === 0;
 
   return (
     <div
       ref={setNodeRef}
       className="relative mb-4 min-h-[200px] rounded-lg border-2 border-dashed border-gray-200 p-4"
     >
-      <div className="absolute -top-3 left-4 flex items-center gap-2 bg-white px-2">
+      <div className="absolute -top-3 left-4 flex items-center gap-2 bg-card px-2">
         {isEditing ? (
           <Input
             className="h-6 w-32"
@@ -99,14 +104,15 @@ export function TierContainer({
           <div className="flex gap-16 justify-center">
             <Xwrapper>
               {tier.positions.map((position) => {
+                const hasSubpos = hasSubpositions(position.id);
                 return (
                   <div key={position.id} className="relative">
                     <PositionCard
                       position={position}
                       accentColor={accentColor}
-                      onDelete={onDelete}
                       onEmployeeSheetOpen={onEmployeeSheetOpen}
                       id={`${position.id}`}
+                      hasSubpositions={hasSubpos}
                     />
                     {position.reports_to_id && (
                       <Xarrow
@@ -120,10 +126,12 @@ export function TierContainer({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-white shadow"
-                      onClick={handleCreateNewPosition}
+                      className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-card shadow"
+                      onClick={() =>
+                        handleCreateNewPosition(position.id, tier.id)
+                      }
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-4 h-4 bg-backgroud" />
                     </Button>
                   </div>
                 );
@@ -132,6 +140,16 @@ export function TierContainer({
           </div>
         </SortableContext>
       </div>
+      {isTierEmpty && (
+        <div className="flex flex-col justify-center items-center h-full">
+          <p className="mb-2 text-lg text-gray-500">
+            Puedes eliminar este Tier vacio:{" "}
+          </p>
+          <Button variant="ghost" size="lg" onClick={handleDeleteTier}>
+            <Trash2 className="w-8 h-8 text-muted-foreground" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

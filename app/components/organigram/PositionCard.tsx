@@ -15,15 +15,15 @@ import type { Position } from "../../types/types";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { useOrgChartStore } from "@/app/store/orgChartStore";
-import { fetchEditPosition, DeletePosition } from "@/app/api/position";
+import { fetchEditPosition } from "@/app/api/position";
 import { toast } from "react-toastify";
 
 interface PositionCardProps {
   position: Position;
   accentColor: string;
-  onDelete?: (id: number) => void;
   onEmployeeSheetOpen?: (id: number) => void;
   id?: string;
+  hasSubpositions?: boolean;
 }
 
 export function PositionCard({
@@ -31,6 +31,7 @@ export function PositionCard({
   accentColor,
   onEmployeeSheetOpen,
   id,
+  hasSubpositions,
 }: PositionCardProps) {
   const {
     attributes,
@@ -43,7 +44,7 @@ export function PositionCard({
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(`${position?.name}`);
-  const { divisionsList, loadDivisions } = useOrgChartStore();
+  const { divisionsList, loadDivisions, deletePosition } = useOrgChartStore();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -64,7 +65,8 @@ export function PositionCard({
     if (updatedPosition) {
       toast.success("Position name updated successfully");
     } else {
-      toast.error("Failed to update position name");
+      toast.error("Failed to update position name due to duplicate name");
+      setName(position.name);
     }
   };
 
@@ -78,7 +80,6 @@ export function PositionCard({
         division_id: selectedDivision.id,
       });
       if (updatedPosition) {
-        // updatePositionDivision(position.id, selectedDivision.id); 
         toast.success("Position division updated successfully");
       } else {
         toast.error("Failed to update position division");
@@ -88,18 +89,13 @@ export function PositionCard({
 
   const handleDeletePosition = async (event: React.MouseEvent) => {
     event.stopPropagation();
-    try {
-      await DeletePosition(position.id);
-      toast.success("Position deleted successfully");
-    } catch (error) {
-      const errorMessage = (error as Error).message;
-      toast.error(`Failed to delete position: ${errorMessage}`);
-    }
+    await deletePosition(position.id);
   };
 
   useEffect(() => {
     loadDivisions();
   }, [loadDivisions]);
+
   return (
     <div
       ref={setNodeRef}
@@ -135,7 +131,9 @@ export function PositionCard({
           />
         ) : (
           <div className="flex items-center gap-2 self-center group">
-            <span className="text-sm font-medium">{name}</span>
+            <span className="text-sm font-medium">
+              {name ? name : "New position"}
+            </span>
             <button
               onClick={(event) => {
                 event.stopPropagation();
@@ -183,7 +181,7 @@ export function PositionCard({
           </SelectContent>
         </Select>
         <div className="self-end">
-          {id !== "1" && (
+          {!hasSubpositions && id !== "1" && (
             <Button
               variant="ghost"
               size="icon"
