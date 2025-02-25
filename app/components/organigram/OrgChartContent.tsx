@@ -5,12 +5,12 @@ import type { Position, Tier } from "../../types/types";
 
 interface OrgChartContentProps {
   tiers: Tier[];
-  activeId: string | null;
+  activeId: number | null;
   onDragStart: (event: DragStartEvent) => void;
   onDragEnd: (event: DragEndEvent) => void;
   onDelete: (id: number) => void;
   onEmployeeSheetOpen?: (id: number) => void;
-  findPosition: (id: string) => Position | undefined;
+  findPosition: (id: number) => Position | undefined;
 }
 
 export function OrgChartContent({

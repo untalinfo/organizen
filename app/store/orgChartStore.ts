@@ -3,6 +3,8 @@ import { Division, Employees, Position, PositionAssignment, Tier, } from "../typ
 import getTiers from "../api/tiers";
 import getDivisions from "../api/divisions";
 import fetchCreateEmployee, { fetchDeleteEmployee, fetchEditEmployee } from "../api/employee";
+import { fetchEditPosition } from "../api/position";
+import { UniqueIdentifier } from "@dnd-kit/core";
 
 interface PositionByIdProps {
   id: number
@@ -26,6 +28,7 @@ interface OrgChartState {
   createNewEmployee: (data: Employees, positionId: number) => Promise<void>;
   deleteEmployee: (position_id: number, position_assignment: PositionAssignment) => Promise<void>;
   editEmployee: (position_id: number, employee: Employees) => Promise<void>;
+  EditPosition: (activePosition: Position, targetTierId: UniqueIdentifier) => Promise<void>;
 }
 
 export const useOrgChartStore = create<OrgChartState>((set, get) => ({
@@ -90,6 +93,26 @@ export const useOrgChartStore = create<OrgChartState>((set, get) => ({
       return tier;
     }
     )}));
+  },
+  EditPosition: async (activePosition, targetTierId) => {
+    const { tiers } = get();
+    const newTiers = [...tiers]
+    const oldTierIndex = newTiers.findIndex((t) => t.id === activePosition.tier_id)
+    const oldTier = newTiers[oldTierIndex]
+    const positionIndex = oldTier.positions.findIndex((p) => p.id === activePosition.id)
+    const [movedPosition] = oldTier.positions.splice(positionIndex, 1)
+
+    movedPosition.tier_id = Number(targetTierId)
+
+    const newTierIndex = newTiers.findIndex((t) => t.id === targetTierId)
+    newTiers[newTierIndex].positions.push(movedPosition)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { position_assignments, divisions, ...data_positions } = activePosition;
+    await fetchEditPosition(data_positions);
+
+    set({ tiers: (newTiers as Tier[]) ?? [] });
+    
+    // await get().loadTiers();
   }
 
 }));

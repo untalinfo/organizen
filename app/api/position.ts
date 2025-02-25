@@ -13,20 +13,10 @@ export default async function Positions() {
   return JSON.stringify(positions, null, 2);
 }
 
-export async function EditPosition(data: Partial<Position>): Promise<Position | null> {
-  const updateData: Partial<Position> = {};
-
-  if (data.name) {
-    updateData.name = data.name;
-  }
-
-  if (data.division_id) {
-    updateData.division_id = data.division_id;
-  }
-
+export async function fetchEditPosition(data: Partial<Position>): Promise<Position | null> {
   const { data: position, error } = await supabase
     .from('positions')
-    .update(updateData)
+    .update(data)
     .eq('id', data.id)
     .select()
     .single();

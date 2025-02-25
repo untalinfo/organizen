@@ -50,7 +50,7 @@ export default function OrgChart() {
         >
           <OrgChartContent
             tiers={tiers}
-            activeId={activeId ? activeId.toString() : null}
+            activeId={activeId ? activeId as number : null}
             onDragStart={(event) =>
               handleDragStart(event, setTransformWrapperDisabled)
             }
