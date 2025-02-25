@@ -53,3 +53,53 @@ export async function DeletePosition(id: number) {
 
   toast.success('Position deleted successfully');
 }
+
+export async function fetchCreateNewPosition(reports_to_id: number, current_tier_id: number): Promise<Position | null> {
+  const new_tier_id = current_tier_id + 1;
+
+  // Verificar si el nuevo tier ya existe
+  const { data: existingTier, error: tierError } = await supabase
+    .from('tiers')
+    .select('*')
+    .eq('id', new_tier_id);
+
+  console.log('existingTier', existingTier);
+
+  if (tierError && tierError.code !== 'PGRST116') { // PGRST116: No rows found
+    toast.error(`Error checking tier: ${tierError.message}`);
+    return null;
+  }
+
+  // Si el nuevo tier no existe, crearlo
+  if (existingTier?.length === 0) {
+    console.log('Creating new tier', new_tier_id);
+    const { error: createTierError } = await supabase
+      .from('tiers')
+      .insert({ id: new_tier_id, name: `Tier ${new_tier_id}` })
+      .select()
+      .single();
+
+    if (createTierError) {
+      toast.error(`Error creating new tier: ${createTierError.message}`);
+      return null;
+    }
+  }
+
+  // Crear la nueva posición
+  const { data: newPosition, error: createPositionError } = await supabase
+    .from('positions')
+    .insert({
+      reports_to_id,
+      tier_id: new_tier_id
+    })
+    .select()
+    .single();
+
+  if (createPositionError) {
+    toast.error(`Error creating new position: ${createPositionError.message}`);
+    return null;
+  }
+
+  toast.success('Position created successfully');
+  return newPosition;
+}

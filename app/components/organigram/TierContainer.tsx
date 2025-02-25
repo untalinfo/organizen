@@ -14,6 +14,7 @@ import { useState } from "react";
 import Xarrow, { Xwrapper } from "react-xarrows";
 import { fetchUpdateTierName } from "@/app/api/tiers";
 import { toast } from "react-toastify";
+import { useOrgChartStore } from "@/app/store/orgChartStore";
 
 interface TierContainerProps {
   tier: Tier;
@@ -36,6 +37,7 @@ export function TierContainer({
   });
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(defaultName || `${tier.name}`);
+  const { createNewPosition } = useOrgChartStore();
 
   const handleNameChange = async () => {
     setIsEditing(false);
@@ -48,21 +50,12 @@ export function TierContainer({
     }
   };
 
-  const handleCreateNewPosition = () => {
-    // const lastPosition = tier.positions[tier.positions.length - 1];
-    // const lastPositionId = parseInt(lastPosition.id.split("-")[1]);
-    // const newPositionId = `position-${lastPositionId + 1}`;
-
-    // tier.positions.push({
-    //   id: newPositionId,
-    //   title: "New Position",
-    //   employees: { count: 0, data: [] },
-    //   division: "Operations",
-    //   tierId: tier.id,
-    //   subordinates: [],
-    // });
-    alert("New position created");
-  }
+  const handleCreateNewPosition = (
+    reports_to_id: number,
+    current_tier_id: number
+  ) => {
+    createNewPosition(reports_to_id, current_tier_id);
+  };
 
   return (
     <div
@@ -122,7 +115,7 @@ export function TierContainer({
                       variant="ghost"
                       size="icon"
                       className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 rounded-full z-10 bg-white shadow"
-                      onClick={handleCreateNewPosition}
+                      onClick={()=>handleCreateNewPosition(position.id, tier.id)}
                     >
                       <Plus className="w-4 h-4" />
                     </Button>

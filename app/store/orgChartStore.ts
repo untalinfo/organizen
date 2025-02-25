@@ -3,7 +3,7 @@ import { Division, Employees, Position, PositionAssignment, Tier, } from "../typ
 import getTiers from "../api/tiers";
 import getDivisions from "../api/divisions";
 import fetchCreateEmployee, { fetchDeleteEmployee, fetchEditEmployee } from "../api/employee";
-import { fetchEditPosition } from "../api/position";
+import { fetchCreateNewPosition, fetchEditPosition } from "../api/position";
 import { UniqueIdentifier } from "@dnd-kit/core";
 
 interface PositionByIdProps {
@@ -29,6 +29,7 @@ interface OrgChartState {
   deleteEmployee: (position_id: number, position_assignment: PositionAssignment) => Promise<void>;
   editEmployee: (position_id: number, employee: Employees) => Promise<void>;
   EditPosition: (activePosition: Position, targetTierId: UniqueIdentifier) => Promise<void>;
+  createNewPosition: (reports_to_id: number, current_tier_id: number) => Promise<void>;
 }
 
 export const useOrgChartStore = create<OrgChartState>((set, get) => ({
@@ -110,39 +111,11 @@ export const useOrgChartStore = create<OrgChartState>((set, get) => ({
     const { position_assignments, divisions, ...data_positions } = activePosition;
     await fetchEditPosition(data_positions);
 
-    set({ tiers: (newTiers as Tier[]) ?? [] });
-    
-    // await get().loadTiers();
-  }
+    set({ tiers: (newTiers as Tier[]) ?? [] }); 
+  },
+  createNewPosition: async (reports_to_id: number, current_tier_id: number) => {
+    await fetchCreateNewPosition(reports_to_id, current_tier_id);
+    await get().loadTiers();
+  },
 
 }));
-
-// {
-//     "id": 1,
-//     "name": "CEO",
-//     "tier_id": 1,
-//     "divisions": {
-//         "id": 4,
-//         "name": "Management"
-//     },
-//     "division_id": 4,
-//     "reports_to_id": null,
-//     "position_assignments": [
-//         {
-//             "id": 4,
-//             "employees": {
-//                 "id": 2,
-//                 "email": "sadjk@gma.com",
-//                 "full_name": "oscar Info"
-//             }
-//         },
-//         {
-//             "id": 11,
-//             "employees": {
-//                 "id": 8,
-//                 "email": "asd@gskjd.com",
-//                 "full_name": "andrea "
-//             }
-//         }
-//     ]
-// }

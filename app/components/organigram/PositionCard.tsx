@@ -136,7 +136,7 @@ export function PositionCard({
           />
         ) : (
           <div className="flex items-center gap-2 self-center group">
-            <span className="text-sm font-medium">{name}</span>
+            <span className="text-sm font-medium">{name ? name : 'New position'}</span>
             <button
               onClick={(event) => {
                 event.stopPropagation();
