@@ -13,17 +13,6 @@ export default async function Positions() {
   return JSON.stringify(positions, null, 2);
 }
 
-export async function PositionById(id: number) {
-  const { data: position, error } = await supabase.from('positions').select(
-    `id, name, position_assignments(id, employees(id, full_name, email)))`
-  ).eq('id', id).single();
-  if (error) {
-    toast.error(`Error feching position by id: ${error.message}`);
-  }
-  return position;
-}
-
-
 export async function EditPosition(data: Partial<Position>): Promise<Position | null> {
   const updateData: Partial<Position> = {};
 
@@ -49,4 +38,30 @@ export async function EditPosition(data: Partial<Position>): Promise<Position | 
     return null;
   }
   return position;
+}
+
+export async function DeletePosition(id: number) {
+  // Eliminar las filas relacionadas en position_assignments
+  const { error: deleteAssignmentsError } = await supabase
+    .from('position_assignments')
+    .delete()
+    .eq('position_id', id);
+
+  if (deleteAssignmentsError) {
+    toast.error(`Error deleting position assignments: ${deleteAssignmentsError.message}`);
+    return;
+  }
+
+  // Eliminar la posición en positions
+  const { error: deletePositionError } = await supabase
+    .from('positions')
+    .delete()
+    .eq('id', id);
+
+  if (deletePositionError) {
+    toast.error(`Error deleting position: ${deletePositionError.message}`);
+    return;
+  }
+
+  toast.success('Position deleted successfully');
 }

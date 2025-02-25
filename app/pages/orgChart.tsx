@@ -27,9 +27,9 @@ export default function OrgChart() {
     handleDelete,
   } = useOrgChart();
 
-   useEffect(() => {
-     loadTiers();
-   }, [loadTiers]);
+  useEffect(() => {
+    loadTiers();
+  }, [loadTiers]);
 
   const handleEmployeeSheetOpen = (id: number) => {
     setSelectedPositionId(id);

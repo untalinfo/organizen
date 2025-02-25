@@ -15,7 +15,7 @@ import type { Position } from "../../types/types";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { useOrgChartStore } from "@/app/store/orgChartStore";
-import { EditPosition } from "@/app/api/position";
+import { EditPosition, DeletePosition } from "@/app/api/position";
 import { toast } from "react-toastify";
 
 interface PositionCardProps {
@@ -29,7 +29,6 @@ interface PositionCardProps {
 export function PositionCard({
   position,
   accentColor,
-  onDelete,
   onEmployeeSheetOpen,
   id,
 }: PositionCardProps) {
@@ -85,6 +84,17 @@ export function PositionCard({
       } else {
         toast.error("Failed to update position division");
       }
+    }
+  };
+
+  const handleDeletePosition = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      await DeletePosition(position.id);
+      toast.success("Position deleted successfully");
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      toast.error(`Failed to delete position: ${errorMessage}`);
     }
   };
 
@@ -178,11 +188,7 @@ export function PositionCard({
             <Button
               variant="ghost"
               size="icon"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDelete?.(position.id);
-                alert("Position deleted");
-              }}
+              onClick={(event) => handleDeletePosition(event)}
             >
               <Trash2 className="w-4 h-4 text-muted-foreground" />
             </Button>

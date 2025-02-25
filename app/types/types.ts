@@ -9,14 +9,15 @@ export interface Division {
   name: string
 }
 
-export interface PositionAssignment  {
+export interface PositionAssignment {
   id: number
   employees: Employees
 }
+
 export interface Position {
   id: number
   name: string
-  divisions?: Division
+  divisions: Division 
   division_id: number
   tier_id: number
   reports_to_id?: number
