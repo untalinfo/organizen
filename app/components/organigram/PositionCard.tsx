@@ -15,7 +15,7 @@ import type { Position } from "../../types/types";
 import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { useOrgChartStore } from "@/app/store/orgChartStore";
-import { EditPosition, DeletePosition } from "@/app/api/position";
+import { fetchEditPosition, DeletePosition } from "@/app/api/position";
 import { toast } from "react-toastify";
 
 interface PositionCardProps {
@@ -60,7 +60,7 @@ export function PositionCard({
 
   const handleNameChange = async () => {
     setIsEditing(false);
-    const updatedPosition = await EditPosition({ id: position.id, name });
+    const updatedPosition = await fetchEditPosition({ id: position.id, name });
     if (updatedPosition) {
       toast.success("Position name updated successfully");
     } else {
@@ -73,7 +73,7 @@ export function PositionCard({
       (division) => division.name === value
     );
     if (selectedDivision) {
-      const updatedPosition = await EditPosition({
+      const updatedPosition = await fetchEditPosition({
         id: position.id,
         division_id: selectedDivision.id,
       });

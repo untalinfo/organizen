@@ -1,16 +1,15 @@
 import { useState } from "react"
-import type { Position, Tier } from "../types/types"
+import type { Position } from "../types/types"
 import { DragEndEvent, UniqueIdentifier } from "@dnd-kit/core"
 import { useOrgChartStore } from "../store/orgChartStore";
 
 export function useOrgChart() {
-  const initialTiers = useOrgChartStore().tiers;
-  const [tiers, setTiers] = useState<Tier[]>(initialTiers)
+  const { tiers, EditPosition } = useOrgChartStore();
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
 
   const findPosition = (id: UniqueIdentifier): Position | undefined => {
     for (const tier of tiers) {
-      const position = tier.positions.find((p) => p.id === id)
+      const position = tier.positions.find((p) => p.id === id as number)
       if (position) return position
     }
   }
@@ -41,33 +40,21 @@ export function useOrgChart() {
       targetTierId = overPosition.tier_id
     }
 
-    setTiers((prevTiers) => {
-      const newTiers = [...prevTiers]
-      const oldTierIndex = newTiers.findIndex((t) => t.id === activePosition.tier_id)
-      const oldTier = newTiers[oldTierIndex]
-      const positionIndex = oldTier.positions.findIndex((p) => p.id === activePosition.id)
-      const [movedPosition] = oldTier.positions.splice(positionIndex, 1)
-
-      movedPosition.tier_id = Number(targetTierId)
-
-      const newTierIndex = newTiers.findIndex((t) => t.id === targetTierId)
-      newTiers[newTierIndex].positions.push(movedPosition)
-
-      return newTiers
-    })
+    EditPosition(activePosition, targetTierId);
 
     setActiveId(null)
     cb(false);
   }
 
   const handleDelete = (positionId: number) => {
-    setTiers((prev) => {
-      const newTiers = prev.map((tier) => ({
-        ...tier,
-        positions: tier.positions.filter((p) => p.id !== positionId),
-      }))
-      return newTiers
-    })
+    console.log("DELETE", positionId)
+    // setTiers((prev) => {
+    //   const newTiers = prev.map((tier) => ({
+    //     ...tier,
+    //     positions: tier.positions.filter((p) => p.id !== positionId),
+    //   }))
+    //   return newTiers
+    // })
   }
 
   return {
