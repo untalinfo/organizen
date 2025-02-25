@@ -1,9 +1,10 @@
 import { useState } from "react"
 import type { Position, Tier } from "../types/types"
-import { initialTiers } from "../data/initialTiers"
 import { DragEndEvent, UniqueIdentifier } from "@dnd-kit/core"
+import { useOrgChartStore } from "../store/orgChartStore";
 
 export function useOrgChart() {
+  const initialTiers = useOrgChartStore().tiers;
   const [tiers, setTiers] = useState<Tier[]>(initialTiers)
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
 

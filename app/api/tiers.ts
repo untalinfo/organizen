@@ -2,8 +2,8 @@ import { supabase } from "@/utils/supabase/supabaseClient";
 import { Tier } from "../types/types";
 import { toast } from "react-toastify";
 
-export default async function Tiers() {
-  const { data: tiers, error } = await supabase.from('tiers').select(`id, name, positions(id, name, reports_to_id, tier_id, divisions(id, name), position_assignments(id, employees(id, full_name, email)))`);
+export default async function getTiers() {
+  const { data: tiers, error } = await supabase.from('tiers').select(`id, name, positions(id, name, division_id, divisions(id, name), reports_to_id, tier_id, position_assignments(id, employees(id, full_name, email)))`);
 
   if (error) {
     toast.error(`Error fetching tiers: ${error.message}`);

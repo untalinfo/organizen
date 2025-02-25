@@ -10,7 +10,7 @@ import {
 import { Pencil, Trash2, Users } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "../ui/input";
-import { Employees } from "@/app/types/types";
+import { Employees, Position } from "@/app/types/types";
 import { useOrgChartStore } from "@/app/store/orgChartStore";
 
 interface EmployeeListProps {
@@ -27,14 +27,12 @@ export default function EmployeeList({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<Employees | null>(null);
   const [error, setError] = useState("");
-  const { positionById, loadPositionsById } = useOrgChartStore();
-  const [localEmployees, setLocalEmployees] = useState(
-    positionById.position_assignments
-  );
+  const { getPositionById } = useOrgChartStore();
+  const [localPosition, setLocalPosition] = useState<Position | undefined>(undefined);
 
   useEffect(() => {
-    setLocalEmployees(positionById.position_assignments);
-  }, [positionById]);
+    setLocalPosition(getPositionById(positionId));
+  }, [getPositionById, positionId]);
 
   const handleOpenForm = (employee: Employees | null = null) => {
     setCurrentEmployee(employee);
@@ -97,9 +95,6 @@ export default function EmployeeList({
     );
   };
 
-  useEffect(() => {
-    loadPositionsById(positionId);
-  }, [loadPositionsById, positionId]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -109,7 +104,7 @@ export default function EmployeeList({
             <div className="flex items-center gap-2">
               <Users className="w-6 h-6" />
               <SheetTitle className="text-xl font-medium">
-                Employees - {`${positionById.name}`}
+                Employees - {`${localPosition?.name}`}
               </SheetTitle>
             </div>
           </div>
@@ -127,12 +122,12 @@ export default function EmployeeList({
         </SheetHeader>
 
         <div className="space-y-2">
-          {localEmployees?.length === 0 ? (
+          {localPosition?.position_assignments?.length === 0 ? (
             <p className="text-center text-muted-foreground">
               You have no employees for this position
             </p>
           ) : (
-            localEmployees
+            localPosition?.position_assignments
               ?.filter(
                 (assignment) => assignment.employees.id !== currentEmployee?.id
               )

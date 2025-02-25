@@ -37,7 +37,7 @@ export function OrgChartContent({
         onDragEnd={onDragEnd}
       >
         <div className="space-y-24">
-          {tiers.map((tier, index) => (
+          {tiers?.map((tier, index) => (
             <div key={tier.id} className="relative w-full">
               <TierContainer
                 tier={tier}
