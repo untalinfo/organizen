@@ -43,7 +43,8 @@ export function TierContainer({
     if (updatedTier) {
       toast.success("Tier name updated successfully");
     } else {
-      toast.error("Failed to update tier name");
+      toast.error("Failed to update tier name, duplicate name found");
+      setName(tier.name);
     }
   };
 

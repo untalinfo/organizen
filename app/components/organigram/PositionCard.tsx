@@ -64,7 +64,8 @@ export function PositionCard({
     if (updatedPosition) {
       toast.success("Position name updated successfully");
     } else {
-      toast.error("Failed to update position name");
+      toast.error("Failed to update position name due to duplicate name");
+      setName(position.name);
     }
   };
 
